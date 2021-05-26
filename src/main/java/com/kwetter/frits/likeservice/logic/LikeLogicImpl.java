@@ -38,8 +38,10 @@ public class LikeLogicImpl implements LikeLogic {
     @Override
     public Integer getLikesByTweet(String tweetId) {
         var like = likeRepository.findLikeByTweetId(tweetId);
-        if (like.getCount() != 0) {
-            return like.getCount();
+        if (like != null) {
+            if (like.getCount() != 0) {
+                return like.getCount();
+            }
         }
         return 0;
     }

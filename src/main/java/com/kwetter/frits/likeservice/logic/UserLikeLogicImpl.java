@@ -56,4 +56,9 @@ public class UserLikeLogicImpl implements UserLikeLogic {
         }
         return false;
     }
+
+    @Override
+    public UserLike findUserLikes(UUID userId) {
+        return userLikeRepository.findUserLikeByUserId(userId);
+    }
 }

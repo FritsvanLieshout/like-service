@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/like")
 public class LikeController {
@@ -44,13 +46,9 @@ public class LikeController {
     }
 
     @GetMapping("/tweet")
-    public ResponseEntity<Integer> getLikesByTweet(@RequestBody LikeViewModel likeViewModel) {
+    public ResponseEntity<Integer> getLikesByTweet(@RequestParam String tweetId) {
         try {
-            var likes = likeLogic.getLikesByTweet(likeViewModel.getTweetId());
-            if (likes != null && likes > 0) {
-                return new ResponseEntity<>(likes, HttpStatus.OK);
-            }
-            return new ResponseEntity<>(0, HttpStatus.OK);
+            return new ResponseEntity<>(likeLogic.getLikesByTweet(tweetId), HttpStatus.OK);
         }
         catch (Exception ex) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -58,9 +56,23 @@ public class LikeController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<Boolean> userAlreadyLiked(@RequestBody LikeViewModel likeViewModel) {
+    public ResponseEntity<Boolean> userAlreadyLiked(@RequestParam String tweetId, @RequestParam UUID userId) {
         try {
-            return new ResponseEntity<>(userLikeLogic.findLikesByUser(likeViewModel.getTweetId(), likeViewModel.getUserId()), HttpStatus.OK);
+            return new ResponseEntity<>(userLikeLogic.findLikesByUser(tweetId, userId), HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/user/likes")
+    public ResponseEntity<?> receiveUserLikes(@RequestParam UUID userId) {
+        try {
+            var userLikes = userLikeLogic.findUserLikes(userId);
+            if (userLikes != null) {
+                return new ResponseEntity<>(userLikes.getLikes(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         catch (Exception ex) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
